@@ -216,19 +216,24 @@ void Graph::printGraph()
 void Graph:: GraphColoring(int max_degree)
 {
     int order[nVertices];
-    for( int i=0;i<nVertices;i++){
-      order[i]=i;
+    for( int i=0; i<nVertices; i++)
+    {
+        order[i]=i;
 
     }
     int n = sizeof(order)/sizeof(order[0]);
 
-    sort(order,order+n,Compare);
+    sort(order,order+n,[&](int& u, int& v)
+    {
+        return adjList[u].getLength()>adjList[v].getLength();
+    });
 
-    result[0]  = 0;
+
+    result[order[0]]  = 0;
 
     for (int u = 0; u < nVertices; u++)
     {
-        if(u == max_degree)
+        if(u == order[0])
         {
             result[u] = 0;
         }
@@ -243,10 +248,10 @@ void Graph:: GraphColoring(int max_degree)
     for (int cr = 0; cr < nVertices; cr++)
         available[cr] = false;
 
-    for (int u = 0; u < nVertices; u++)
+    for (int u = 1; u < nVertices; u++)
     {
 
-        for (int i=0; i<adjList[u].getLength(); i++)
+        for (int i=0; i<adjList[order[u]].getLength(); i++)
             if (result[i] != -1)
                 available[result[i]] = true;
         int cr;
