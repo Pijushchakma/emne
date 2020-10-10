@@ -149,6 +149,8 @@ public:
     void GraphColoring(int max_degree);
     int getResult(int node);
     bool Compare (int &u,int &v)const;
+    void DSatur();
+    int Highest_Saturation_degree();
 };
 
 Graph::Graph()
@@ -213,6 +215,7 @@ void Graph::printGraph()
         printf("\n");
     }
 }
+/// ........................................................for coloring graph by largest degree...................................................................
 void Graph:: GraphColoring(int max_degree)
 {
     int order[nVertices];
@@ -258,7 +261,7 @@ void Graph:: GraphColoring(int max_degree)
         for (cr = 0; cr < nVertices; cr++)
             if (available[cr] == false)
                 break;
-        result[u] = cr;
+        result[order[u]] = cr;
 
         for (int i=0; i<adjList[u].getLength(); i++)
             if (result[i] != -1)
@@ -271,7 +274,96 @@ void Graph:: GraphColoring(int max_degree)
              << result[u] << endl;
 
 }
+void Graph :: DSatur()
+{
+    int order[nVertices];
+    for( int i=0; i<nVertices; i++)
+    {
+        order[i]=i;
 
+    }
+    int n = sizeof(order)/sizeof(order[0]);
+
+    sort(order,order+n,[&](int& u, int& v)
+    {
+        return adjList[u].getLength()>adjList[v].getLength();
+    });
+
+
+    result[order[0]]  = 0;
+
+    for (int u = 0; u < nVertices; u++)
+    {
+        if(u == order[0])
+        {
+            result[u] = 0;
+        }
+        else
+        {
+            result[u] = -1;
+        }
+    }
+    bool available[nVertices];
+    for (int cr = 0; cr < nVertices; cr++)
+        available[cr] = false;
+    for (int u = 1; u < nVertices; u++)
+    {
+        int node = Highest_Saturation_degree();
+        for (int i=0; i<adjList[node].getLength(); i++)
+            if (result[i] != -1)
+                available[result[i]] = true;
+        int cr;
+        for (cr = 0; cr < nVertices; cr++)
+            if (available[cr] == false)
+                break;
+        result[node] = cr;
+        for (int i=0; i<adjList[node].getLength(); i++)
+            if (result[i] != -1)
+                available[result[i]] = false;
+
+
+    }
+    cout << " For DSatur \n";
+    for (int u = 0; u < nVertices; u++)
+        cout << "Course No : " << u << " ---> Day : "
+             << result[u] << endl;
+}
+int Graph :: Highest_Saturation_degree()
+{
+    int ind = -1,sat =-1;
+    for(int i=0; i<nVertices; i++)
+    {
+        if(result[i]!= -1) continue;
+        set < int> st;
+        for (int i=0; i<adjList[i].getLength(); i++)
+            if (result[i] != -1)
+                st.emplace(result[i]);
+
+        if(st.size()>=sat)
+        {
+            if(sat ==-1 )
+            {
+                sat=st.size();
+                ind=i;
+            }
+            else if(st.size() == sat)
+            {
+                if(adjList[i].getLength()> adjList[ind].getLength())
+                {
+                    sat=st.size();
+                    ind=i;
+
+                }
+            }
+            ind=i;
+            sat=st.size();
+
+        }
+    }
+    return ind;
+
+
+}
 Graph::~Graph()
 {
     delete[] adjList;
@@ -507,6 +599,7 @@ int main()
     double res = totalPenalty/nstudents;
 
     cout << " Average Penalty : "<< res<< endl;
+    g.DSatur();
 
 
     //g.printGraph();
