@@ -35,6 +35,9 @@ public:
     void insert(const int data);
     Node* Insert( Node* root, Node* pt);
     void levelOrderHelper();
+    bool Search(int value);
+    bool Search_help( Node *&N, int value);
+
 
 
 };
@@ -192,42 +195,107 @@ void Red_Black_tree:: levelOrderHelper()
     while (!q.empty())
     {
         Node *temp = q.front();
-        cout << temp->data << "  ";
+        if(visited[temp->data]!=1)
+        {
+            if(temp->color==1)
+            {
+                cout << temp->data << ": r ";
+            }
+            else
+            {
+                cout << temp->data << ": b ";
+            }
 
+        }
         visited[temp->data] =1;
-        //visited[temp->data] =1;
         q.pop();
 
 
         if (temp->left != NULL && ( visited[temp->left->data]!=1))
         {
-            cout << "left";
+            cout<< "(";
             q.push(temp->left);
         }
         else if (temp->right != NULL&&visited[temp->right->data]!=1)
         {
-            cout << "right";
+            cout<< "(";
             q.push(temp->right);
         }
-        else
+        else if(temp->parent)
         {
-            cout << "Parent - "<< temp->parent->data << "    : temp :"<<temp->data;
             q.push(temp->parent);
+            cout << ")";
         }
     }
+}
+bool Red_Black_tree::Search(int value)
+{
+    if(Search_help(root,value))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    //return;
+
+}
+bool Red_Black_tree::Search_help( Node *&N, int value)
+{
+    //cout<<"Left "<< N->left->data<< endl;
+    //if((N->right)!=NULL){
+       //cout<<"right "<< N->right->data<< endl;
+    //}
+
+    if( N->data == value)
+    {
+        return true;
+    }
+    else if(value > N->data&& (N->right!=NULL))
+    {
+        if(Search_help(N->right,value))
+        {
+            return true;
+        }
+
+    }
+    else if(value < N->data && (N->left!=NULL))
+    {
+        if(Search_help(N->left,value))
+        {
+            return true;
+
+        }
+        //return;
+    }
+    //cout << "False"<< endl;
+    return false;
+
+
+
 }
 
 int main()
 {
     Red_Black_tree rb;
 
-    rb.insert(15);
-    rb.insert(17);
-    rb.insert(18);
-    rb.insert(12);
-    rb.insert(19);
-    rb.insert(16);
-    rb.insert(23);
+    rb.insert(1);
+    rb.insert(3);
+    rb.insert(4);
+    rb.insert(6);
+    rb.insert(7);
+    rb.insert(8);
+    rb.insert(10);
+    rb.insert(13);
+    rb.insert(14);
+    if(rb.Search(80)){
+       cout <<  "True"<< endl;
+
+    }
+     else cout<< "False "<< endl;
+    //rb.Search(6);
+
     rb.levelOrderHelper();
 //cout << rb.root.data << "   "<< rb.root.color<< endl;
 
