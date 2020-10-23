@@ -1,0 +1,234 @@
+#include<stdio.h>
+#include<bits/stdc++.h>
+using namespace std;
+struct Node
+{
+    int data;
+    int color;
+    Node *parent;
+    Node  *left;
+    Node  *right;
+    int *visited;
+    Node (int data)
+    {
+        this->data = data;
+        this->color = 1; ///red =1 ,black =0
+        parent = NULL;
+        left =NULL;
+        right = NULL;
+    }
+
+};
+class Red_Black_tree
+{
+    Node *root;
+    int *visited;
+public:
+    Red_Black_tree()
+    {
+        root = NULL;
+
+    }
+    void Right_Rotation( Node *&, Node *&);
+    void Left_Rotation(Node *&, Node *&);
+    void Balance (Node *&, Node *&);
+    void insert(const int data);
+    Node* Insert( Node* root, Node* pt);
+    void levelOrderHelper();
+
+
+};
+Node* Red_Black_tree::Insert(Node* root,Node* N)
+{
+    if( root == NULL)
+        return N;
+    if( N->data > root->data)
+    {
+        root->right = Insert(root->right, N);
+        root->right->parent = root;
+
+    }
+    if( N->data < root->data)
+    {
+        root->left = Insert(root->left, N);
+        root->left->parent = root;
+
+    }
+    return root;
+
+
+
+}
+void Red_Black_tree::Balance (Node *&root, Node *&N)
+{
+    Node *grand_parent = NULL;
+    Node *uncle = NULL;
+    Node *parent = NULL;
+    while ((N != root) && (N->color == 1) &&(N->parent->color == 1))
+
+    {
+        parent = N->parent;
+        grand_parent = N->parent->parent;
+        if (parent->data > grand_parent->data)
+        {
+            uncle = grand_parent->left;
+            if ((uncle != NULL) && (uncle->color == 1))
+            {
+                grand_parent->color = 1;
+                parent->color = 0;
+                uncle->color = 0;
+                N = grand_parent;
+            }
+            else
+            {
+                if (N == parent->left)
+                {
+                    Right_Rotation(root, parent);
+                    N = parent;
+                    parent = N->parent;
+                }
+                Left_Rotation(root, grand_parent);
+                swap(parent->color, grand_parent->color);
+                N = parent;
+            }
+        }
+        else
+        {
+            uncle = grand_parent->right;
+            if (uncle != NULL && uncle->color == 1)
+            {
+                grand_parent->color = 1;
+                parent->color = 0;
+                uncle->color = 0;
+                N = grand_parent;
+            }
+
+            else
+            {
+                if (N == parent->right)
+                {
+                    Left_Rotation(root, parent);
+                    N = parent;
+                    parent =N->parent;
+                }
+
+
+                Right_Rotation(root, grand_parent);
+                swap(parent->color, grand_parent->color);
+                N = parent;
+            }
+        }
+
+
+
+    }
+    root->color = 0;
+}
+void Red_Black_tree::Left_Rotation(Node *&root, Node *&N)
+{
+    Node *N_right = N->right;
+
+    N->right = N_right->left;
+
+    if (N->right != NULL)
+        N->right->parent = N;
+
+    N_right->parent = N->parent;
+
+    if (N->parent == NULL)
+        root = N_right;
+
+    else if (N == N->parent->left)
+        N->parent->left = N_right;
+
+    else
+        N->parent->right = N_right;
+
+    N_right->left = N;
+    N->parent = N_right;
+}
+
+void Red_Black_tree::Right_Rotation(Node *&root, Node *&N)
+{
+    Node *N_left = N->left;
+
+    N->left = N_left->right;
+
+    if (N->left != NULL)
+        N->left->parent = N;
+
+    N_left->parent =N->parent;
+
+    if (N->parent == NULL)
+        root = N_left;
+
+    else if (N == N->parent->left)
+        N->parent->left = N_left;
+
+    else
+        N->parent->right = N_left;
+
+    N_left->right = N;
+    N->parent = N_left;
+}
+void Red_Black_tree::insert(const int data)
+{
+    Node *N = new Node(data);
+    root = Insert(root, N);
+    //cout << " Value: " << N->data << "  color: "<< N->color;
+    Balance(root, N);
+
+
+}
+void Red_Black_tree:: levelOrderHelper()
+{
+    if (root == NULL)
+        return;
+
+    std::queue<Node *> q;
+    q.push(root);
+    map<int, int> visited;
+    int size1 =10;
+    while (!q.empty())
+    {
+        Node *temp = q.front();
+        cout << temp->data << "  ";
+
+        visited[temp->data] =1;
+        //visited[temp->data] =1;
+        q.pop();
+
+
+        if (temp->left != NULL && ( visited[temp->left->data]!=1))
+        {
+            cout << "left";
+            q.push(temp->left);
+        }
+        else if (temp->right != NULL&&visited[temp->right->data]!=1)
+        {
+            cout << "right";
+            q.push(temp->right);
+        }
+        else
+        {
+            cout << "Parent - "<< temp->parent->data << "    : temp :"<<temp->data;
+            q.push(temp->parent);
+        }
+    }
+}
+
+int main()
+{
+    Red_Black_tree rb;
+
+    rb.insert(15);
+    rb.insert(17);
+    rb.insert(18);
+    rb.insert(12);
+    rb.insert(19);
+    rb.insert(16);
+    rb.insert(23);
+    rb.levelOrderHelper();
+//cout << rb.root.data << "   "<< rb.root.color<< endl;
+
+}
